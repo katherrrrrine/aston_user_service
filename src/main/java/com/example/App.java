@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class App {
@@ -89,8 +90,8 @@ public class App {
         Long id = scanner.nextLong();
         scanner.nextLine();
 
-        User user = userDao.findById(id);
-        if (user != null) {
+        Optional<User> user = userDao.findById(id);
+        if (user.isPresent()) {
             System.out.println("Пользователь найден: " + user);
         } else {
             System.out.println("Пользователь с ID " + id + " не найден");
@@ -112,31 +113,31 @@ public class App {
         Long id = scanner.nextLong();
         scanner.nextLine();
 
-        User user = userDao.findById(id);
-        if (user == null) {
+        Optional<User> user = userDao.findById(id);
+        if (user.isEmpty()) {
             System.out.println("Пользователь с ID " + id + " не найден");
             return;
         }
 
-        System.out.print("Введите новое имя (текущее: " + user.getName() + "): ");
+        System.out.print("Введите новое имя (текущее: " + user.get().getName() + "): ");
         String name = scanner.nextLine();
         if (!name.isEmpty()) {
-            user.setName(name);
+            user.get().setName(name);
         }
 
-        System.out.print("Введите новый email (текущее: " + user.getEmail() + "): ");
+        System.out.print("Введите новый email (текущее: " + user.get().getEmail() + "): ");
         String email = scanner.nextLine();
         if (!email.isEmpty()) {
-            user.setEmail(email);
+            user.get().setEmail(email);
         }
 
-        System.out.print("Введите новый возраст (текущий: " + user.getAge() + "): ");
+        System.out.print("Введите новый возраст (текущий: " + user.get().getAge() + "): ");
         String ageInput = scanner.nextLine();
         if (!ageInput.isEmpty()) {
-            user.setAge(Integer.parseInt(ageInput));
+            user.get().setAge(Integer.parseInt(ageInput));
         }
 
-        userDao.update(user);
+        userDao.update(user.orElse(null));
         System.out.println("Пользователь успешно обновлен: " + user);
     }
 
@@ -145,9 +146,9 @@ public class App {
         Long id = scanner.nextLong();
         scanner.nextLine();
 
-        User user = userDao.findById(id);
-        if (user != null) {
-            userDao.delete(user);
+        Optional<User> user = userDao.findById(id);
+        if (user.isPresent()) {
+            userDao.delete(user.orElse(null));
             System.out.println("Пользователь с ID " + id + " успешно удален");
         } else {
             System.out.println("Пользователь с ID " + id + " не найден");
