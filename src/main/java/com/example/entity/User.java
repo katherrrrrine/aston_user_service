@@ -42,9 +42,7 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
     public void setEmail(String email) {
         this.email = email;
@@ -53,6 +51,10 @@ public class User {
     public int getAge() {
         return age;
     }
+
+    public Long getId() { return id;  }
+
+    public void setId(Long id) { this.id = id; }
 
     public void setAge(int age) {
         this.age = age;
