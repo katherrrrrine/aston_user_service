@@ -2,16 +2,18 @@ package com.example.dao;
 
 import com.example.entity.User;
 import com.example.util.HibernateUtil;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -21,18 +23,19 @@ class UserDaoIntegrationTest {
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.1-alpine")
             .withDatabaseName("testdb")
             .withUsername("test")
-            .withPassword("test");
+            .withPassword("test")
+            .withReuse(true);
 
     private static UserDao userDao;
 
     @BeforeAll
     static void setup() {
-        // Обновляем настройки Hibernate для Testcontainers
         System.setProperty("hibernate.connection.url", postgres.getJdbcUrl());
         System.setProperty("hibernate.connection.username", postgres.getUsername());
         System.setProperty("hibernate.connection.password", postgres.getPassword());
         System.setProperty("hibernate.connection.pool_size", "5");
         System.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+        System.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
 
         userDao = new UserDaoImpl();
     }
@@ -107,5 +110,64 @@ class UserDaoIntegrationTest {
 
         Optional<User> deletedUser = userDao.findById(user.getId());
         assertTrue(deletedUser.isEmpty());
+    }
+    @Test
+    @Order(7)
+    void saveUserException() {
+        SessionFactory originalFactory = HibernateUtil.getSessionFactory();
+        try {
+            SessionFactory mockFactory = mock(SessionFactory.class);
+            when(mockFactory.openSession()).thenThrow(new HibernateException("Database connection failed"));
+            HibernateUtil.setSessionFactory(mockFactory);
+            User user = new User("Test User", "test@example.com", 30);
+            assertThrows(RuntimeException.class, () -> userDao.save(user));
+        } finally {
+            HibernateUtil.setSessionFactory(originalFactory);
+        }
+    }
+
+    @Test
+    @Order(8)
+    void findByIdException() {
+        SessionFactory originalFactory = HibernateUtil.getSessionFactory();
+        try {
+            SessionFactory mockFactory = mock(SessionFactory.class);
+            when(mockFactory.openSession()).thenThrow(new HibernateException("Database connection failed"));
+            HibernateUtil.setSessionFactory(mockFactory);
+            Optional<User> result = userDao.findById(1L);
+            assertTrue(result.isEmpty());
+        } finally {
+            HibernateUtil.setSessionFactory(originalFactory);
+        }
+    }
+
+    @Test
+    @Order(9)
+    void updateException() {
+        SessionFactory originalFactory = HibernateUtil.getSessionFactory();
+        try {
+            SessionFactory mockFactory = mock(SessionFactory.class);
+            when(mockFactory.openSession()).thenThrow(new HibernateException("Database connection failed"));
+            HibernateUtil.setSessionFactory(mockFactory);
+            User user = new User("Test User", "test@example.com", 30);
+            assertThrows(RuntimeException.class, () -> userDao.update(user));
+        } finally {
+            HibernateUtil.setSessionFactory(originalFactory);
+        }
+    }
+
+    @Test
+    @Order(10)
+    void deleteException() {
+        SessionFactory originalFactory = HibernateUtil.getSessionFactory();
+        try {
+            SessionFactory mockFactory = mock(SessionFactory.class);
+            when(mockFactory.openSession()).thenThrow(new HibernateException("Database connection failed"));
+            HibernateUtil.setSessionFactory(mockFactory);
+            User user = new User("Test User", "test@example.com", 30);
+            assertThrows(RuntimeException.class, () -> userDao.delete(user));
+        } finally {
+            HibernateUtil.setSessionFactory(originalFactory);
+        }
     }
 }
