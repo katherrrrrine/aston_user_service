@@ -52,8 +52,17 @@ public class App {
         } catch (Exception e) {
             logger.error("Произошла ошибка: ", e);
         } finally {
-            HibernateUtil.shutdown();
-            scanner.close();
+            try {
+                HibernateUtil.shutdown();
+            } catch (Exception e) {
+                logger.error("Ошибка при закрытии Hibernate", e);
+            }
+            try {
+                scanner.close();
+            } catch (Exception e) {
+                logger.error("Ошибка при закрытии Scanner", e);
+            }
+
             logger.info("Приложение остановлено");
         }
     }
