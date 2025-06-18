@@ -2,29 +2,33 @@ package com.example.controller;
 
 import com.example.dto.UserCreateDto;
 import com.example.dto.UserDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.example.service.UserService;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@RequestBody UserCreateDto userCreateDTO) {
+    public UserDto createUser(@Valid @RequestBody UserCreateDto userCreateDTO) {
         return userService.createUser(userCreateDTO);
     }
 
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable("id") Integer id) {
-            return userService.getUserById(id);
-        }
+    public UserDto getUser(@PathVariable Integer id) {
+        return userService.getUserById(id);
+    }
 
     @GetMapping
     public List<UserDto> getAllUsers() {

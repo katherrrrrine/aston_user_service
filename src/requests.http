@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "name": "test",
-  "email": "test8@example.com",
+  "email": "test@example.com",
   "age": 33
 }
 
@@ -12,18 +12,18 @@ Content-Type: application/json
 GET http://localhost:8080/api/users
 
 ### 3. Получить пользователя по ID
-GET http://localhost:8080/api/users/142
+GET http://localhost:8080/api/users/167
 
 ### 4. Обновить пользователя
-PUT http://localhost:8080/api/users/136
+PUT http://localhost:8080/api/users/167
 Content-Type: application/json
 
 {
   "name": "test1",
-  "email": "test1.updated@example.com",
+  "email": "test.updated@example.com",
   "age": 33
 }
 
 ### 5. Удалить пользователя
-DELETE http://localhost:8080/api/users/118
+DELETE http://localhost:8080/api/users/174
 

@@ -22,7 +22,7 @@ public class User {
     @Column(nullable = false)
     private Integer age;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
